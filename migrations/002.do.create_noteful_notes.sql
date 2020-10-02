@@ -5,7 +5,7 @@ CREATE TABLE noteful_notes (
   note_name TEXT NOT NULL,
   modified TIMESTAMPTZ NOT NULL DEFAULT now(),
   content TEXT,
-  folder_id INTEGER REFERENCES noteful_folders(id) ON DELETE CASCADE NOT NULL
+  folder_id INTEGER REFERENCES noteful_folders(id) ON DELETE CASCADE
 );
 
 COMMIT;
