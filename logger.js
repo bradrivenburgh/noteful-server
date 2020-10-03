@@ -1,5 +1,5 @@
 const winston = require('winston');
-const { NODE_ENV } = require('./config');
+const { NODE_ENV } = require('./src/config');
 
 // Set up winston logger
 const logger = winston.createLogger({

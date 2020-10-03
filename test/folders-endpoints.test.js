@@ -1,16 +1,8 @@
-/**
- * Sample endpoints implementation test file for normalized DB 
- * using postgreSQL. Shows data seeding and cleanup; shows type
- * of tests to create.
- */
-
-const { expect } = require('chai');
 const knex = require('knex');
 const app = require('../src/app');
-const { makeArticlesArray, makeMaliciousArticle } = require('./articles.fixtures');
-const { makeUsersArray } = require('./users.fixtures');
+const { makeFoldersArray, makeMaliciousFolder } = require('./folders.fixtures');
 
-describe('Articles Endpoints', function () {
+describe('Folders Endpoints', function () {
   let db;
 
   before('make knex instance', () => {
@@ -22,24 +14,23 @@ describe('Articles Endpoints', function () {
     app.set('db', db);
   });
 
-  before('clean the table', () => db.raw('TRUNCATE blogful_articles, blogful_users, blogful_comments RESTART IDENTITY CASCADE'));
+  before('clean the table', () => db.raw('TRUNCATE noteful_folders, noteful_notes RESTART IDENTITY CASCADE'));
   
   after('disconnect from db', () => db.destroy());
 
-  afterEach('cleanup', () => db.raw('TRUNCATE blogful_articles, blogful_users, blogful_comments RESTART IDENTITY CASCADE'));
+  afterEach('cleanup', () => db.raw('TRUNCATE noteful_folders, noteful_notes RESTART IDENTITY CASCADE'));
 
-  describe(`GET /api/articles`, () => {
-    context(`Given no articles`, () => {
+  describe.only(`GET /api/folders`, () => {
+    context(`Given no folders`, () => {
       it('responds with 200 and an empty list', () => {
         return supertest(app)
-          .get('/api/articles')
+          .get('/api/folders')
           .expect(200, []);
       });
     });
-
+/* 
     context(`Given there are articles in the database`, () => {
-      const testUsers = makeUsersArray();
-      const testArticles = makeArticlesArray();
+      const testArticles = makeFoldersArray();
 
       beforeEach('insert articles', () => {
         return db
@@ -53,7 +44,7 @@ describe('Articles Endpoints', function () {
       });
 
       context(`Given an XSS attack article`, () => {
-        const { maliciousArticle, expectedArticle } = makeMaliciousArticle();
+        const { maliciousArticle, expectedArticle } = makeMaliciousFolder();
 
         beforeEach("insert malicious article", () => {
           return db.into("blogful_articles").insert([maliciousArticle]);
@@ -77,8 +68,9 @@ describe('Articles Endpoints', function () {
           .expect(200, testArticles)
       });
     });
+*/    
   });
-
+/*
   describe(`GET /api/articles/:article_id`, () => {
     context(`Given no articles`, () => {
       it(`responds with 404`, () => {
@@ -91,7 +83,7 @@ describe('Articles Endpoints', function () {
 
     context(`Given there are articles in the database`, () => {
       const testUsers = makeUsersArray();
-      const testArticles = makeArticlesArray();
+      const testArticles = makeFoldersArray();
 
       beforeEach('insert articles', () => {
         return db
@@ -105,7 +97,7 @@ describe('Articles Endpoints', function () {
       });
 
       context(`Given an XSS attack article`, () => {
-        const { maliciousArticle, expectedArticle } = makeMaliciousArticle();
+        const { maliciousArticle, expectedArticle } = makeMaliciousFolder();
 
         beforeEach("insert malicious article", () => {
           return db.into("blogful_articles").insert([maliciousArticle]);
@@ -185,7 +177,7 @@ describe('Articles Endpoints', function () {
     });
 
     context(`Given an XSS attack article`, () => {
-      const { maliciousArticle, expectedArticle } = makeMaliciousArticle();
+      const { maliciousArticle, expectedArticle } = makeMaliciousFolder();
   
       it("removes XSS attack content", () => {
         return supertest(app)
@@ -212,7 +204,7 @@ describe('Articles Endpoints', function () {
 
     context('given the are articles in the database', () => {
       const testUsers = makeUsersArray();
-      const testArticles = makeArticlesArray();
+      const testArticles = makeFoldersArray();
 
       beforeEach('insert articles', () => {
         return db
@@ -253,7 +245,7 @@ describe('Articles Endpoints', function () {
 
     context('Given there are articles in the database', () => {
       const testUsers = makeUsersArray();
-      const testArticles = makeArticlesArray();
+      const testArticles = makeFoldersArray();
 
       beforeEach('insert articles', () => {
         return db
@@ -324,5 +316,5 @@ describe('Articles Endpoints', function () {
       });
     });
   });
-
-});
+*/
+ });

@@ -1,11 +1,11 @@
 require('dotenv').config();
 const express = require('express');
-const { logger } = require('../logger');
+//const { logger } = require('../logger');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
-
+const foldersRouter = require('./folders/folders-router');
 
 const app = express();
 
@@ -47,6 +47,7 @@ app.use(helmet());
 // app.use(express.json()); // Enable if using non-GET endpoints
 // app.use(validateBearerToken); // Enable after adding validation
 // Routers can go here
+app.use('/api', foldersRouter);
 app.use(errorHandler);
 
 app.get('/', (req, res) => {
