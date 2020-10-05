@@ -22,4 +22,27 @@ foldersRouter
       .catch(next);
   });
 
+  foldersRouter
+    .route('/folders/:folder_id')
+    .all((req, res, next) => {
+      const folderId = req.params.folder_id;
+      FoldersService.getById(knex(req), folderId)
+        .then(folder => {
+          if (!folder) {
+            return res.status(404).json({
+              error: { message: 'Folder does not exist' }
+            });
+          }
+          res.folder = folder;
+          next();
+        })
+        .catch(next)
+    });
+
+  foldersRouter
+    .route('/folders/:folder_id')
+    .get((req, res, next) => {
+      res.json(serializeFolder(res.folder));
+    });
+
   module.exports = foldersRouter;

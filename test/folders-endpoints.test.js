@@ -16,11 +16,12 @@ describe('Folders Endpoints', function () {
 
   before('clean the table', () => db.raw('TRUNCATE noteful_folders, noteful_notes RESTART IDENTITY CASCADE'));
   
-  after('disconnect from db', () => db.destroy());
-
   afterEach('cleanup', () => db.raw('TRUNCATE noteful_folders, noteful_notes RESTART IDENTITY CASCADE'));
 
-  describe.only(`GET /api/folders`, () => {
+  after('disconnect from db', () => db.destroy());
+
+
+  describe(`GET /api/folders`, () => {
     context(`Given no folders`, () => {
       it('responds with 200 and an empty list', () => {
         return supertest(app)
@@ -28,108 +29,107 @@ describe('Folders Endpoints', function () {
           .expect(200, []);
       });
     });
-/* 
-    context(`Given there are articles in the database`, () => {
-      const testArticles = makeFoldersArray();
 
-      beforeEach('insert articles', () => {
+    context(`Given there are articles in the database`, () => {
+      const testFolders = makeFoldersArray();
+
+      beforeEach('insert folders', () => {
         return db
-          .into('blogful_users')
-          .insert(testUsers)
+          .into('noteful_folders')
+          .insert(testFolders)
           .then(() => {
-            return db
-              .into('blogful_articles')
-              .insert(testArticles);
+            // when adding table connected by foreign key, add here
+            // return db
+            //   .into('noteful_folders')
+            //   .insert(testFolders);
           })
       });
 
-      context(`Given an XSS attack article`, () => {
-        const { maliciousArticle, expectedArticle } = makeMaliciousFolder();
+      context(`Given an XSS attack folder`, () => {
+        const { maliciousFolder, expectedFolder } = makeMaliciousFolder();
 
-        beforeEach("insert malicious article", () => {
-          return db.into("blogful_articles").insert([maliciousArticle]);
+        beforeEach("insert malicious folder", () => {
+          return db.into("noteful_folders").insert([maliciousFolder]);
         });
 
         it("removes XSS attack content", () => {
           return supertest(app)
-            .get(`/api/articles`)
+            .get(`/api/folders`)
             .expect(200)
             .expect((res) => {
-              const insertedArticle = res.body[res.body.length - 1];
-              expect(insertedArticle.title).to.eql(expectedArticle.title);
-              expect(insertedArticle.content).to.eql(expectedArticle.content);
+              const insertedFolder = res.body[res.body.length - 1];
+              expect(insertedFolder.folder_name).to.eql(expectedFolder.folder_name);
             });
         });
       });
       
-      it(`responds with 200 and all of the articles`, () => {
+      it(`responds with 200 and all of the folders`, () => {
         return supertest(app)
-          .get('/api/articles')
-          .expect(200, testArticles)
+          .get('/api/folders')
+          .expect(200, testFolders)
       });
     });
-*/    
+  
   });
-/*
-  describe(`GET /api/articles/:article_id`, () => {
-    context(`Given no articles`, () => {
+
+  describe(`GET /api/folders/:folder_id`, () => {
+    context(`Given no folders`, () => {
       it(`responds with 404`, () => {
-        const articleId = 123456;
+        const folderId = 123456;
         return supertest(app)
-          .get(`/api/articles/${articleId}`)
-          .expect(404, { error: {  message: `Article doesn't exist` } });
+          .get(`/api/folders/${folderId}`)
+          .expect(404, { error: {  message: `Folder does not exist` } });
       });
     });
 
-    context(`Given there are articles in the database`, () => {
-      const testUsers = makeUsersArray();
-      const testArticles = makeFoldersArray();
+    context(`Given there are folders in the database`, () => {
+      const testFolders = makeFoldersArray();
 
-      beforeEach('insert articles', () => {
+      beforeEach('insert folders', () => {
         return db
-          .into('blogful_users')
-          .insert(testUsers)
+          .into('noteful_folders')
+          .insert(testFolders)
           .then(() => {
-            return db
-              .into('blogful_articles')
-              .insert(testArticles);
+            // when adding table connected by foreign key, add here
+            // return db
+            //   .into('noteful_folders')
+            //   .insert(testFolders);
           })
       });
 
-      context(`Given an XSS attack article`, () => {
-        const { maliciousArticle, expectedArticle } = makeMaliciousFolder();
+      context(`Given an XSS attack folder`, () => {
+        const { maliciousFolder, expectedFolder } = makeMaliciousFolder();
 
-        beforeEach("insert malicious article", () => {
-          return db.into("blogful_articles").insert([maliciousArticle]);
+        beforeEach("insert malicious folder", () => {
+          return db.into("noteful_folders").insert([maliciousFolder]);
         });
 
         it("removes XSS attack content", () => {
           return supertest(app)
-            .get(`/api/articles/${maliciousArticle.id}`)
+            .get(`/api/folders/${maliciousFolder.id}`)
             .expect(200)
             .expect((res) => {
-              expect(res.body.title).to.eql(expectedArticle.title)
-              expect(res.body.content).to.eql(expectedArticle.content)
+              expect(res.body.folder_name).to.eql(expectedFolder.folder_name)
             });
         });
       });
 
-      it(`responds with 200 and the specified article`, () => {
-        const article_id = 1;
-        const expectedArticle = testArticles[article_id - 1]
+      it(`responds with 200 and the specified folder`, () => {
+        const folder_id = 1;
+        const expectedFolder = testFolders[folder_id - 1]
         return supertest(app)
-          .get(`/api/articles/${article_id}`)
-          .expect(200, expectedArticle)
+          .get(`/api/folders/${folder_id}`)
+          .expect(200, expectedFolder)
       });
     });
   });
-
+/*
   describe('POST /api/articles', () => {
     it('creates an article, responding with 201 and the new article', function () {
       this.retries(3);
 
       const newArticle = {
-        title: 'Test new article',
+        folder_name: 'Test new article',
         style: 'Listicle',
         content: 'Test new article content...'
       };
@@ -139,7 +139,7 @@ describe('Folders Endpoints', function () {
       .send(newArticle)
       .expect(201)
       .expect(res => {
-        expect(res.body.title).to.eql(newArticle.title);
+        expect(res.body.folder_name).to.eql(newArticle.folder_name);
         expect(res.body.style).to.eql(newArticle.style);
         expect(res.body.content).to.eql(newArticle.content);
         expect(res.body).to.have.property('id');
@@ -156,10 +156,10 @@ describe('Folders Endpoints', function () {
       });
     });
 
-    const requiredFields = ['title', 'style', 'content'];
+    const requiredFields = ['folder_name', 'style', 'content'];
     requiredFields.forEach(field => {
       const newArticle = {
-        title: 'Test new article',
+        folder_name: 'Test new article',
         style: 'Listicle',
         content: 'Test new article content...'
       };
@@ -177,16 +177,16 @@ describe('Folders Endpoints', function () {
     });
 
     context(`Given an XSS attack article`, () => {
-      const { maliciousArticle, expectedArticle } = makeMaliciousFolder();
+      const { maliciousFolder, expectedFolder } = makeMaliciousFolder();
   
       it("removes XSS attack content", () => {
         return supertest(app)
           .post(`/api/articles`)
-          .send(maliciousArticle)
+          .send(maliciousFolder)
           .expect(201)
           .expect((res) => {
-            expect(res.body.title).to.eql(expectedArticle.title);
-            expect(res.body.content).to.eql(expectedArticle.content);
+            expect(res.body.folder_name).to.eql(expectedFolder.folder_name);
+            expect(res.body.content).to.eql(expectedFolder.content);
           });
       });
     });
@@ -219,7 +219,7 @@ describe('Folders Endpoints', function () {
 
       it('responds with 204 and removes the article', () => {
         const idToRemove = 2;
-        const expectedArticles = testArticles
+        const expectedFolders = testArticles
           .filter(article => article.id !== idToRemove);
         return supertest(app)
           .delete(`/api/articles/${idToRemove}`)
@@ -227,7 +227,7 @@ describe('Folders Endpoints', function () {
           .then(res => {
             return supertest(app)
               .get('/api/articles')
-              .expect(expectedArticles)
+              .expect(expectedFolders)
           });
       });
     });
@@ -261,11 +261,11 @@ describe('Folders Endpoints', function () {
       it('responds with 204 and updates the article', () => {
         const idToUpdate = 2;
         const updateArticle = {
-          title: 'updated article title',
+          folder_name: 'updated article folder_name',
           style: 'Interview',
           content: 'updated article content',
         };
-        const expectedArticle = {
+        const expectedFolder = {
           ...testArticles[idToUpdate - 1],
           ...updateArticle
         }
@@ -277,7 +277,7 @@ describe('Folders Endpoints', function () {
           .then(res => {
             return supertest(app)
               .get(`/api/articles/${idToUpdate}`)
-              .expect(expectedArticle)
+              .expect(expectedFolder)
           });
       });
 
@@ -288,7 +288,7 @@ describe('Folders Endpoints', function () {
           .send({ irrelevantField: 'foo' })
           .expect(400, {
             error: {
-              message: `Request body must contain either 'title', 'style' or 'content'`
+              message: `Request body must contain either 'folder_name', 'style' or 'content'`
             }
           });
       });
@@ -296,10 +296,10 @@ describe('Folders Endpoints', function () {
       it('responds with 204 when updating only a subset of fields', () => {
         const idToUpdate = 2;
         const updateArticle = {
-          title: 'updated article title',
+          folder_name: 'updated article folder_name',
           content: 'updated article content'
         };
-        const expectedArticle = {
+        const expectedFolder = {
           ...testArticles[idToUpdate - 1],
           ...updateArticle
         }
@@ -311,7 +311,7 @@ describe('Folders Endpoints', function () {
           .then(res => {
             return supertest(app)
               .get(`/api/articles/${idToUpdate}`)
-              .expect(expectedArticle)
+              .expect(expectedFolder)
           });
       });
     });
