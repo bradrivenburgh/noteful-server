@@ -8,12 +8,31 @@
       },
     };
 
+    const requiredNoteDictionary = {
+      note_name: (value) => {
+        if (!value) { 
+          return false;
+        }
+      },
+      content: (value) => {
+        if (!value) { 
+          return false;
+        }
+      },
+      folder_id: (value) => {
+        if (!value || typeof value !== 'number') {
+          return false;
+        }
+      },
+    };
+
     // Custom validation messages here
     const customInvalidPropsMessages = {
-      prop: 'custom message',
+      folder_id: 'Invalid property provided: folder_id -- must be a number',
     };
 
     module.exports = {
       requiredFolderDictionary,
+      requiredNoteDictionary,
       customInvalidPropsMessages
     };

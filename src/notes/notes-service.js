@@ -4,7 +4,7 @@ const NotesService = {
       .select('*')
       .from('noteful_notes');
   },
-  insertFolder(knex, newNote) {
+  insertNote(knex, newNote) {
     return knex
       .insert(newNote)
       .into('noteful_notes')
@@ -20,14 +20,14 @@ const NotesService = {
       .where({ id })
       .first();
   },
-  deleteFolder(knex, id) {
+  deleteNote(knex, id) {
     return knex
       .select('*')
       .from('noteful_notes')
       .where({ id })
       .delete();
   },
-  updateFolder(knex, id, newNoteData) {
+  updateNote(knex, id, newNoteData) {
     return knex
       .select('*')
       .from('noteful_notes')
