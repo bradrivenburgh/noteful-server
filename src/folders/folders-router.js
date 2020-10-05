@@ -85,8 +85,8 @@ foldersRouter
   foldersRouter
     .route('/folders/:folder_id')
     .delete((req, res, next) => {
-        const folder_id = req.params.folder_id;
-        FoldersService.deleteFolder(knex(req), folder_id)
+        const folderId = req.params.folder_id;
+        FoldersService.deleteFolder(knex(req), folderId)
           .then(() => {
             res
               .status(204)
@@ -106,7 +106,7 @@ foldersRouter
       const numOfRequiredValues = 
         Object.values(folderToUpdate).filter(Boolean).length;
       if (numOfRequiredValues === 0) {
-        res.status(400).json({
+        return res.status(400).json({
           error: {
             message: 'Request body must contain: folder_name' 
           }
