@@ -1,5 +1,5 @@
 const winston = require('winston');
-const { NODE_ENV } = require('./src/config');
+const { NODE_ENV } = require('./config');
 
 // Set up winston logger
 const logger = winston.createLogger({
@@ -16,5 +16,5 @@ if (NODE_ENV !== 'production') {
 }
 
 module.exports = {
-  "logger": logger
+  logger
 };
