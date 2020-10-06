@@ -35,7 +35,7 @@ function makeMaliciousNote() {
   const maliciousNote = {
     id: 911,
     modified: new Date().toISOString(),
-    folder_id: null,
+    folder_id: 1,
     note_name: 'Naughty naughty very naughty <script>alert("xss");</script>',
     content: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`
   }
