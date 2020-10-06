@@ -14,11 +14,11 @@
           return false;
         }
       },
-      content: (value) => {
-        if (!value) { 
-          return false;
-        }
-      },
+      // content: (value) => {
+      //   if (!value) { 
+      //     return false;
+      //   }
+      // },
       folder_id: (value) => {
         if (!value || typeof value !== 'number') {
           return false;

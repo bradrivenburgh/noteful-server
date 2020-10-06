@@ -167,7 +167,7 @@ describe('Folders Endpoints', function () {
       });
     });
 
-    const requiredFields = ['note_name', 'content', 'folder_id'];
+    const requiredFields = ['note_name', 'folder_id'];
     requiredFields.forEach(field => {
       const newNote = {
         note_name: 'New test folder',
