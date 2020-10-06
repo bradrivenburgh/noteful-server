@@ -1,6 +1,9 @@
 const knex = require('knex');
 const app = require('../src/app');
-const { makeFoldersArray, makeMaliciousFolder } = require('./folders.fixtures');
+const { makeFoldersArray, 
+        makeMaliciousFolder, 
+        serializeFolder 
+      } = require('./folders.fixtures');
 
 describe('Folders Endpoints', function () {
   let db;
@@ -58,7 +61,7 @@ describe('Folders Endpoints', function () {
             .expect(200)
             .expect((res) => {
               const insertedFolder = res.body[res.body.length - 1];
-              expect(insertedFolder.folder_name).to.eql(expectedFolder.folder_name);
+              expect(insertedFolder.folderName).to.eql(expectedFolder.folderName);
             });
         });
       });
@@ -66,7 +69,7 @@ describe('Folders Endpoints', function () {
       it(`responds with 200 and all of the folders`, () => {
         return supertest(app)
           .get('/api/folders')
-          .expect(200, testFolders)
+          .expect(200, testFolders.map(serializeFolder))
       });
     });
   
@@ -109,16 +112,16 @@ describe('Folders Endpoints', function () {
             .get(`/api/folders/${maliciousFolder.id}`)
             .expect(200)
             .expect((res) => {
-              expect(res.body.folder_name).to.eql(expectedFolder.folder_name)
+              expect(res.body.folderName).to.eql(expectedFolder.folderName)
             });
         });
       });
 
       it(`responds with 200 and the specified folder`, () => {
-        const folder_id = 1;
-        const expectedFolder = testFolders[folder_id - 1]
+        const folderId = 1;
+        const expectedFolder = serializeFolder(testFolders[folderId - 1]);
         return supertest(app)
-          .get(`/api/folders/${folder_id}`)
+          .get(`/api/folders/${folderId}`)
           .expect(200, expectedFolder)
       });
     });
@@ -130,7 +133,7 @@ describe('Folders Endpoints', function () {
       // this.retries(3);
 
       const newFolder = {
-        folder_name: 'Test new folder',
+        folderName: 'Test new folder',
       };
 
       return supertest(app)
@@ -138,7 +141,7 @@ describe('Folders Endpoints', function () {
       .send(newFolder)
       .expect(201)
       .expect(res => {
-        expect(res.body.folder_name).to.eql(newFolder.folder_name);
+        expect(res.body.folderName).to.eql(newFolder.folderName);
         expect(res.body).to.have.property('id');
         expect(res.headers.location).to.eql(`/api/folders/${res.body.id}`);
       })
@@ -149,10 +152,10 @@ describe('Folders Endpoints', function () {
       });
     });
 
-    const requiredFields = ['folder_name'];
+    const requiredFields = ['folderName'];
     requiredFields.forEach(field => {
       const newFolder = {
-        folder_name: 'Test new folder',
+        folderName: 'Test new folder',
       };
   
       it(`responds with 400 and an error message when the '${field}' is missing`, () => {
@@ -169,14 +172,19 @@ describe('Folders Endpoints', function () {
 
     context(`Given an XSS attack folder`, () => {
       const { maliciousFolder, expectedFolder } = makeMaliciousFolder();
-  
+      // Change folder_name key to camelCase since that is the format the JS client 
+      // will send it; delete the leftover folder_name property
+      maliciousFolder.folderName = maliciousFolder.folder_name;
+      delete maliciousFolder.folder_name;
+
       it("removes XSS attack content", () => {
         return supertest(app)
           .post(`/api/folders`)
           .send(maliciousFolder)
           .expect(201)
           .expect((res) => {
-            expect(res.body.folder_name).to.eql(expectedFolder.folder_name);
+            console.log(res.body.folderName);
+            expect(res.body.folderName).to.eql(expectedFolder.folderName);
           });
       });
     });
@@ -208,7 +216,8 @@ describe('Folders Endpoints', function () {
 
       it('responds with 204 and removes the folder', () => {
         const idToRemove = 2;
-        const expectedFolders = testFolders
+        const serializedTestFolders = testFolders.map(serializeFolder);
+        const expectedFolders = serializedTestFolders
           .filter(folder => folder.id !== idToRemove);
         return supertest(app)
           .delete(`/api/folders/${idToRemove}`)
@@ -249,10 +258,11 @@ describe('Folders Endpoints', function () {
       it('responds with 204 and updates the folder', () => {
         const idToUpdate = 2;
         const updateFolder = {
-          folder_name: 'updated folder folder_name',
+          folderName: 'updated folder_name',
         };
+        const serializedUpdateFolder = serializeFolder(testFolders[idToUpdate - 1]);
         const expectedFolder = {
-          ...testFolders[idToUpdate - 1],
+          ...serializedUpdateFolder,
           ...updateFolder
         }
 
@@ -274,7 +284,7 @@ describe('Folders Endpoints', function () {
           .send({ irrelevantField: 'foo' })
           .expect(400, {
             error: {
-              message: `Request body must contain: folder_name`
+              message: `Request body must contain: folderName`
             }
           });
       });
@@ -282,10 +292,11 @@ describe('Folders Endpoints', function () {
       it('responds with 204 when updating only a subset of fields', () => {
         const idToUpdate = 2;
         const updateFolder = {
-          folder_name: 'updated folder folder_name'
+          folderName: 'updated folder folder_name'
         };
+        const serializedUpdateFolder = serializeFolder(testFolders[idToUpdate - 1]);
         const expectedFolder = {
-          ...testFolders[idToUpdate - 1],
+          ...serializedUpdateFolder,
           ...updateFolder
         }
 

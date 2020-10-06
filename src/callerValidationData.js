@@ -1,7 +1,7 @@
     // Define invalid values for caller's required properties;
     // pass this to ValidationService
     const requiredFolderDictionary = {
-      folder_name: (value) => {
+      folderName: (value) => {
         if (!value) { 
           return false;
         }
@@ -9,7 +9,7 @@
     };
 
     const requiredNoteDictionary = {
-      note_name: (value) => {
+      noteName: (value) => {
         if (!value) { 
           return false;
         }
@@ -19,7 +19,7 @@
           return false;
         }
       },
-      folder_id: (value) => {
+      folderId: (value) => {
         if (!value || typeof value !== 'number') {
           return false;
         }

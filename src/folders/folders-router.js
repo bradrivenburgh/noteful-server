@@ -10,7 +10,7 @@ const foldersRouter = express.Router();
 const knex = (req) => req.app.get('db');
 const serializeFolder = (folder) => ({
   id: folder.id,
-  folder_name: xss(folder.folder_name)
+  folderName: xss(folder.folder_name)
 });
 
 foldersRouter
@@ -28,8 +28,8 @@ foldersRouter
 foldersRouter
   .route('/folders')
   .post((req, res, next) => {
-    const { folder_name } = req.body;
-    const newFolder = { folder_name };
+    const { folderName } = req.body;
+    const newFolder = { folder_name: folderName }; // Change key to folder_name for DB table
 
     // VALIDATE
     const missingAndInvalidProps = ValidationService.validateProperties(
@@ -98,9 +98,9 @@ foldersRouter
   foldersRouter
     .route('/folders/:folder_id')
     .patch((req, res, next) => {
-      const { folder_name } = req.body;
+      const { folderName } = req.body;
       const { folder_id } = req.params;
-      const folderToUpdate = { folder_name };
+      const folderToUpdate = { folder_name: folderName };
 
       // Check if required prop is being updated
       const numOfRequiredValues = 
@@ -108,7 +108,7 @@ foldersRouter
       if (numOfRequiredValues === 0) {
         return res.status(400).json({
           error: {
-            message: 'Request body must contain: folder_name' 
+            message: 'Request body must contain: folderName' 
           }
         });
       }

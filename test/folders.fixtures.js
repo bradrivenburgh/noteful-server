@@ -1,3 +1,5 @@
+const xss = require('xss');
+
 function makeFoldersArray() {
   return [
     {
@@ -23,6 +25,12 @@ function makeFoldersArray() {
   ];
 }
 
+const serializeFolder = (folder) => ({
+  id: folder.id,
+  folderName: xss(folder.folder_name)
+});
+
+
 function makeMaliciousFolder() {
   const maliciousFolder = {
     id: 911,
@@ -30,7 +38,7 @@ function makeMaliciousFolder() {
   }
   const expectedFolder = {
     ...maliciousFolder,
-    folder_name: 'Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
+    folderName: 'Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
   }
   return {
     maliciousFolder,
@@ -41,4 +49,5 @@ function makeMaliciousFolder() {
 module.exports = {
   makeFoldersArray,
   makeMaliciousFolder,
+  serializeFolder
 }
