@@ -11,9 +11,9 @@ const knex = (req) => req.app.get('db');
 const serializeNote = (note) => ({
   id: note.id,
   modified: note.modified,
-  note_name: xss(note.note_name),
+  noteName: xss(note.note_name),
   content: xss(note.content),
-  folder_id: note.folder_id
+  folderId: note.folder_id
 });
 
 notesRouter
@@ -31,8 +31,8 @@ notesRouter
 notesRouter
   .route('/notes')
   .post((req, res, next) => {
-    const { note_name, content, folder_id } = req.body;
-    const newNote = { note_name, content, folder_id };
+    const { noteName, content, folderId } = req.body;
+    const newNote = { note_name: noteName, content, folder_id: folderId };
 
     // VALIDATE
     const missingAndInvalidProps = ValidationService.validateProperties(
@@ -102,9 +102,9 @@ notesRouter
   notesRouter
     .route('/notes/:note_id')
     .patch((req, res, next) => {
-      const { note_name, content, folder_id } = req.body;
+      const { noteName, content, folderId } = req.body;
       const { note_id } = req.params;
-      const noteToUpdate = { note_name, content, folder_id };
+      const noteToUpdate = { note_name: noteName, content, folder_id: folderId };
 
       // VALIDATE
       const missingAndInvalidProps = ValidationService.validateProperties(
@@ -116,10 +116,10 @@ notesRouter
 
       // Check if there is at least one required prop being updated
       if (missingProps.length === numOfRequiredProps) {
-        logger.error(`message: 'Request body must contain either: note_name, content, or folder_id'`)
+        logger.error(`message: 'Request body must contain either: noteName or folderId'`)
         return res.status(400).json({
           error: {
-            message: 'Request body must contain either: note_name, content, or folder_id' 
+            message: 'Request body must contain either: noteName or folderId' 
           }
         }); 
       }

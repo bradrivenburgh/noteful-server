@@ -1,7 +1,7 @@
     // Define invalid values for caller's required properties;
     // pass this to ValidationService
     const requiredFolderDictionary = {
-      folder_name: (value) => {
+      folderName: (value) => {
         if (!value) { 
           return false;
         }
@@ -9,17 +9,12 @@
     };
 
     const requiredNoteDictionary = {
-      note_name: (value) => {
+      noteName: (value) => {
         if (!value) { 
           return false;
         }
       },
-      // content: (value) => {
-      //   if (!value) { 
-      //     return false;
-      //   }
-      // },
-      folder_id: (value) => {
+      folderId: (value) => {
         if (!value || typeof value !== 'number') {
           return false;
         }
@@ -28,7 +23,7 @@
 
     // Custom validation messages here
     const customInvalidPropsMessages = {
-      folder_id: 'Invalid property provided: folder_id -- must be a number',
+      folderId: 'Invalid property provided: folderId -- must be a number',
     };
 
     module.exports = {
