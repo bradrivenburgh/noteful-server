@@ -167,7 +167,7 @@ describe('Folders Endpoints', function () {
       });
     });
 
-    const requiredFields = ['note_name', 'content', 'folder_id'];
+    const requiredFields = ['note_name', 'folder_id'];
     requiredFields.forEach(field => {
       const newNote = {
         note_name: 'New test folder',
@@ -297,7 +297,7 @@ describe('Folders Endpoints', function () {
           .send({ irrelevantField: 'foo' })
           .expect(400, {
             error: {
-              message: 'Request body must contain either: note_name, content, or folder_id'
+              message: 'Request body must contain either: note_name or folder_id'
             }
           });
       });

@@ -14,11 +14,6 @@
           return false;
         }
       },
-      content: (value) => {
-        if (!value) { 
-          return false;
-        }
-      },
       folderId: (value) => {
         if (!value || typeof value !== 'number') {
           return false;

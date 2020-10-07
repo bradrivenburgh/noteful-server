@@ -1,5 +1,3 @@
-const xss = require('xss');
-
 function makeFoldersArray() {
   return [
     {
@@ -25,9 +23,9 @@ function makeFoldersArray() {
   ];
 }
 
-const serializeFolder = (folder) => ({
+const camelCaseKeys = (folder) => ({
   id: folder.id,
-  folderName: xss(folder.folder_name)
+  folderName: folder.folder_name
 });
 
 
@@ -49,5 +47,5 @@ function makeMaliciousFolder() {
 module.exports = {
   makeFoldersArray,
   makeMaliciousFolder,
-  serializeFolder
+  camelCaseKeys
 }

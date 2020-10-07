@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const { makeFoldersArray, 
         makeMaliciousFolder, 
-        serializeFolder 
+        camelCaseKeys 
       } = require('./folders.fixtures');
 
 describe('Folders Endpoints', function () {
@@ -69,7 +69,7 @@ describe('Folders Endpoints', function () {
       it(`responds with 200 and all of the folders`, () => {
         return supertest(app)
           .get('/api/folders')
-          .expect(200, testFolders.map(serializeFolder))
+          .expect(200, testFolders.map(camelCaseKeys))
       });
     });
   
@@ -119,7 +119,7 @@ describe('Folders Endpoints', function () {
 
       it(`responds with 200 and the specified folder`, () => {
         const folderId = 1;
-        const expectedFolder = serializeFolder(testFolders[folderId - 1]);
+        const expectedFolder = camelCaseKeys(testFolders[folderId - 1]);
         return supertest(app)
           .get(`/api/folders/${folderId}`)
           .expect(200, expectedFolder)
@@ -216,7 +216,7 @@ describe('Folders Endpoints', function () {
 
       it('responds with 204 and removes the folder', () => {
         const idToRemove = 2;
-        const serializedTestFolders = testFolders.map(serializeFolder);
+        const serializedTestFolders = testFolders.map(camelCaseKeys);
         const expectedFolders = serializedTestFolders
           .filter(folder => folder.id !== idToRemove);
         return supertest(app)
@@ -260,7 +260,7 @@ describe('Folders Endpoints', function () {
         const updateFolder = {
           folderName: 'updated folder_name',
         };
-        const serializedUpdateFolder = serializeFolder(testFolders[idToUpdate - 1]);
+        const serializedUpdateFolder = camelCaseKeys(testFolders[idToUpdate - 1]);
         const expectedFolder = {
           ...serializedUpdateFolder,
           ...updateFolder
@@ -294,7 +294,7 @@ describe('Folders Endpoints', function () {
         const updateFolder = {
           folderName: 'updated folder folder_name'
         };
-        const serializedUpdateFolder = serializeFolder(testFolders[idToUpdate - 1]);
+        const serializedUpdateFolder = camelCaseKeys(testFolders[idToUpdate - 1]);
         const expectedFolder = {
           ...serializedUpdateFolder,
           ...updateFolder
