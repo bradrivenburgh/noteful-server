@@ -1,6 +1,10 @@
 const knex = require('knex');
 const app = require('../src/app');
-const { makeNotesArray, makeMaliciousNote } = require('./notes.fixtures');
+const { 
+  makeNotesArray, 
+  makeMaliciousNote,
+  camelCaseKeys
+} = require('./notes.fixtures');
 const { makeFoldersArray } = require('./folders.fixtures');
 
 describe('Folders Endpoints', function () {
@@ -59,7 +63,7 @@ describe('Folders Endpoints', function () {
             .expect(200)
             .expect((res) => {
               const insertedNote = res.body[res.body.length - 1];
-              expect(insertedNote.note_name).to.eql(expectedNote.note_name);
+              expect(insertedNote.noteName).to.eql(expectedNote.noteName);
               expect(insertedNote.content).to.eql(expectedNote.content);
             });
         });
@@ -68,7 +72,7 @@ describe('Folders Endpoints', function () {
       it(`responds with 200 and all of the notes`, () => {
         return supertest(app)
           .get('/api/notes')
-          .expect(200, testNotes)
+          .expect(200, testNotes.map(camelCaseKeys))
       });
     });
   
@@ -111,17 +115,17 @@ describe('Folders Endpoints', function () {
             .get(`/api/notes/${maliciousNote.id}`)
             .expect(200)
             .expect((res) => {
-              expect(res.body.note_name).to.eql(expectedNote.note_name);
+              expect(res.body.noteName).to.eql(expectedNote.noteName);
               expect(res.body.content).to.eql(expectedNote.content);
             });
         });
       });
 
       it(`responds with 200 and the specified note`, () => {
-        const note_id = 1;
-        const expectedNote = testNotes[note_id - 1]
+        const noteId = 1;
+        const expectedNote = camelCaseKeys(testNotes[noteId - 1]);
         return supertest(app)
-          .get(`/api/notes/${note_id}`)
+          .get(`/api/notes/${noteId}`)
           .expect(200, expectedNote)
       });
     });
@@ -140,9 +144,9 @@ describe('Folders Endpoints', function () {
       this.retries(3);
 
       const newNote = {
-        note_name: 'Test new note',
+        noteName: 'Test new note',
         content: 'Test new content',
-        folder_id: 1
+        folderId: 1
       };
 
       return supertest(app)
@@ -150,9 +154,9 @@ describe('Folders Endpoints', function () {
       .send(newNote)
       .expect(201)
       .expect(res => {
-        expect(res.body.note_name).to.eql(newNote.note_name);
+        expect(res.body.noteName).to.eql(newNote.noteName);
         expect(res.body.content).to.eql(newNote.content);
-        expect(res.body.folder_id).to.eql(newNote.folder_id);
+        expect(res.body.folderId).to.eql(newNote.folderId);
         expect(res.body).to.have.property('id');
         expect(res.headers.location).to.eql(`/api/notes/${res.body.id}`);
 
@@ -167,12 +171,12 @@ describe('Folders Endpoints', function () {
       });
     });
 
-    const requiredFields = ['note_name', 'folder_id'];
+    const requiredFields = ['noteName', 'folderId'];
     requiredFields.forEach(field => {
       const newNote = {
-        note_name: 'New test folder',
+        noteName: 'New test folder',
         content: 'New test content',
-        folder_id: 1
+        folderId: 1
       };
   
       it(`responds with 400 and an error message when the '${field}' is missing`, () => {
@@ -189,6 +193,8 @@ describe('Folders Endpoints', function () {
 
     context(`Given an XSS attack note`, () => {
       const { maliciousNote, expectedNote } = makeMaliciousNote();
+      maliciousFolder.noteName = maliciousFolder.note_name;
+      delete maliciousFolder.note_name;
 
       it('removes XSS attack content', () => {
         return supertest(app)
@@ -196,7 +202,7 @@ describe('Folders Endpoints', function () {
           .send(maliciousNote)
           .expect(201)
           .expect((res) => {
-            expect(res.body.note_name).to.eql(expectedNote.note_name);
+            expect(res.body.noteName).to.eql(expectedNote.noteName);
             expect(res.body.content).to.eql(expectedNote.content);
           });
       });
@@ -228,10 +234,11 @@ describe('Folders Endpoints', function () {
           })
       });
 
-      it('responds with 204 and removes the folder', () => {
+      it('responds with 204 and removes the note', () => {
         const idToRemove = 2;
-        const expectedNotes = testNotes
-          .filter(folder => folder.id !== idToRemove);
+        const serializedTestNotes = testNotes.map(camelCaseKeys);
+        const expectedNotes = serializedTestNotes
+          .filter(note => note.id !== idToRemove);
         return supertest(app)
           .delete(`/api/notes/${idToRemove}`)
           .expect(204)
@@ -272,12 +279,14 @@ describe('Folders Endpoints', function () {
       it('responds with 204 and updates the folder', () => {
         const idToUpdate = 2;
         const updateNote = {
-          note_name: 'updated note_name',
+          noteName: 'updated noteName',
+          content: 'updated content'
         };
+        const serializedTestNote = camelCaseKeys(testNotes[idToUpdate - 1]);
         const expectedNote = {
-          ...testNotes[idToUpdate - 1],
+          ...serializedTestNote,
           ...updateNote
-        }
+        };
 
         return supertest(app)
           .patch(`/api/notes/${idToUpdate}`)
@@ -297,7 +306,7 @@ describe('Folders Endpoints', function () {
           .send({ irrelevantField: 'foo' })
           .expect(400, {
             error: {
-              message: 'Request body must contain either: note_name or folder_id'
+              message: 'Request body must contain either: noteName or folderId'
             }
           });
       });
@@ -305,12 +314,13 @@ describe('Folders Endpoints', function () {
       it('responds with 204 when updating only a subset of fields', () => {
         const idToUpdate = 2;
         const updateNote = {
-          note_name: 'updated note_name'
+          noteName: 'updated note_name'
         };
+        const serializedTestNote = camelCaseKeys(testNotes[idToUpdate - 1]);
         const expectedNote = {
-          ...testNotes[idToUpdate - 1],
+          ...serializedTestNote,
           ...updateNote
-        }
+        };
 
         return supertest(app)
           .patch(`/api/notes/${idToUpdate}`)

@@ -1,9 +1,10 @@
 const knex = require('knex');
 const app = require('../src/app');
-const { makeFoldersArray, 
-        makeMaliciousFolder, 
-        camelCaseKeys 
-      } = require('./folders.fixtures');
+const { 
+  makeFoldersArray, 
+  makeMaliciousFolder, 
+  camelCaseKeys 
+} = require('./folders.fixtures');
 
 describe('Folders Endpoints', function () {
   let db;
@@ -183,7 +184,6 @@ describe('Folders Endpoints', function () {
           .send(maliciousFolder)
           .expect(201)
           .expect((res) => {
-            console.log(res.body.folderName);
             expect(res.body.folderName).to.eql(expectedFolder.folderName);
           });
       });
@@ -264,7 +264,7 @@ describe('Folders Endpoints', function () {
         const expectedFolder = {
           ...serializedUpdateFolder,
           ...updateFolder
-        }
+        };
 
         return supertest(app)
           .patch(`/api/folders/${idToUpdate}`)
@@ -298,7 +298,7 @@ describe('Folders Endpoints', function () {
         const expectedFolder = {
           ...serializedUpdateFolder,
           ...updateFolder
-        }
+        };
 
         return supertest(app)
           .patch(`/api/folders/${idToUpdate}`)

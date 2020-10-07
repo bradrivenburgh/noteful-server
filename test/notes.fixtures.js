@@ -31,6 +31,14 @@ function makeNotesArray() {
   ];
 }
 
+const camelCaseKeys = (note) => ({
+  id: note.id,
+  modified: note.modified,
+  noteName: note.note_name,
+  content: note.content,
+  folderId: note.folder_id
+});
+
 function makeMaliciousNote() {
   const maliciousNote = {
     id: 911,
@@ -39,11 +47,11 @@ function makeMaliciousNote() {
     note_name: 'Naughty naughty very naughty <script>alert("xss");</script>',
     content: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`
   }
-  const expectedNote = {
+  const expectedNote = camelCaseKeys({
     ...maliciousNote,
     note_name: 'Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
     content: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`
-  }
+  });
   return {
     maliciousNote,
     expectedNote,
@@ -53,4 +61,5 @@ function makeMaliciousNote() {
 module.exports = {
   makeNotesArray,
   makeMaliciousNote,
+  camelCaseKeys
 }

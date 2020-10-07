@@ -34,10 +34,10 @@ function makeMaliciousFolder() {
     id: 911,
     folder_name: 'Naughty naughty very naughty <script>alert("xss");</script>',
   }
-  const expectedFolder = {
+  const expectedFolder = camelCaseKeys({
     ...maliciousFolder,
-    folderName: 'Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
-  }
+    folder_name: 'Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
+  })
   return {
     maliciousFolder,
     expectedFolder,
