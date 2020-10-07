@@ -172,11 +172,8 @@ describe('Folders Endpoints', function () {
     });
 
     context(`Given an XSS attack folder`, () => {
-      const { maliciousFolder, expectedFolder } = makeMaliciousFolder();
-      // Change folder_name key to camelCase since that is the format the JS client 
-      // will send it; delete the leftover folder_name property
-      maliciousFolder.folderName = maliciousFolder.folder_name;
-      delete maliciousFolder.folder_name;
+      let { maliciousFolder, expectedFolder } = makeMaliciousFolder();
+      maliciousFolder = camelCaseKeys(maliciousFolder);
 
       it("removes XSS attack content", () => {
         return supertest(app)

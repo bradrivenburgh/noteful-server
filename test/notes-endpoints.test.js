@@ -7,7 +7,7 @@ const {
 } = require('./notes.fixtures');
 const { makeFoldersArray } = require('./folders.fixtures');
 
-describe('Folders Endpoints', function () {
+describe('Notes Endpoints', function () {
   let db;
 
   before('make knex instance', () => {
@@ -192,9 +192,8 @@ describe('Folders Endpoints', function () {
     });
 
     context(`Given an XSS attack note`, () => {
-      const { maliciousNote, expectedNote } = makeMaliciousNote();
-      maliciousFolder.noteName = maliciousFolder.note_name;
-      delete maliciousFolder.note_name;
+      let { maliciousNote, expectedNote } = makeMaliciousNote();
+      maliciousNote = camelCaseKeys(maliciousNote);
 
       it('removes XSS attack content', () => {
         return supertest(app)

@@ -102,7 +102,7 @@ foldersRouter
       const { folder_id } = req.params;
       const folderToUpdate = { folder_name: folderName };
 
-      // Check if required prop is being updated
+      // Check if folderName is being updated
       const numOfRequiredValues = 
         Object.values(folderToUpdate).filter(Boolean).length;
       if (numOfRequiredValues === 0) {

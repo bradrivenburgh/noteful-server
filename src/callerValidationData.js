@@ -23,7 +23,7 @@
 
     // Custom validation messages here
     const customInvalidPropsMessages = {
-      folder_id: 'Invalid property provided: folder_id -- must be a number',
+      folderId: 'Invalid property provided: folderId -- must be a number',
     };
 
     module.exports = {
