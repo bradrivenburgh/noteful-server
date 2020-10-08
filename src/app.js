@@ -48,8 +48,8 @@ app.use(helmet());
 app.use(express.json()); // Enable if using non-GET endpoints
 // app.use(validateBearerToken); // Enable after adding validation
 // Routers can go here
-app.use('/api', foldersRouter);
-app.use('/api', notesRouter);
+app.use('/api/noteful', foldersRouter);
+app.use('/api/noteful', notesRouter);
 app.use(errorHandler);
 
 app.get('/', (req, res) => {
