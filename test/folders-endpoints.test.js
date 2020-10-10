@@ -25,11 +25,11 @@ describe('Folders Endpoints', function () {
   after('disconnect from db', () => db.destroy());
 
 
-  describe(`GET /api/folders`, () => {
+  describe(`GET /api/noteful/folders`, () => {
     context(`Given no folders`, () => {
       it('responds with 200 and an empty list', () => {
         return supertest(app)
-          .get('/api/folders')
+          .get('/api/noteful/folders')
           .expect(200, []);
       });
     });
@@ -41,12 +41,6 @@ describe('Folders Endpoints', function () {
         return db
           .into('noteful_folders')
           .insert(testFolders)
-          .then(() => {
-            // when adding table connected by foreign key, add here
-            // return db
-            //   .into('noteful_folders')
-            //   .insert(testFolders);
-          })
       });
 
       context(`Given an XSS attack folder`, () => {
@@ -58,7 +52,7 @@ describe('Folders Endpoints', function () {
 
         it("removes XSS attack content", () => {
           return supertest(app)
-            .get(`/api/folders`)
+            .get(`/api/noteful/folders`)
             .expect(200)
             .expect((res) => {
               const insertedFolder = res.body[res.body.length - 1];
@@ -69,19 +63,19 @@ describe('Folders Endpoints', function () {
       
       it(`responds with 200 and all of the folders`, () => {
         return supertest(app)
-          .get('/api/folders')
+          .get('/api/noteful/folders')
           .expect(200, testFolders.map(camelCaseKeys))
       });
     });
   
   });
 
-  describe(`GET /api/folders/:folder_id`, () => {
+  describe(`GET /api/noteful/folders/:folder_id`, () => {
     context(`Given no folders`, () => {
       it(`responds with 404`, () => {
         const folderId = 123456;
         return supertest(app)
-          .get(`/api/folders/${folderId}`)
+          .get(`/api/noteful/folders/${folderId}`)
           .expect(404, { error: {  message: `Folder does not exist` } });
       });
     });
@@ -93,12 +87,6 @@ describe('Folders Endpoints', function () {
         return db
           .into('noteful_folders')
           .insert(testFolders)
-          .then(() => {
-            // when adding table connected by foreign key, add here
-            // return db
-            //   .into('noteful_folders')
-            //   .insert(testFolders);
-          })
       });
 
       context(`Given an XSS attack folder`, () => {
@@ -110,7 +98,7 @@ describe('Folders Endpoints', function () {
 
         it("removes XSS attack content", () => {
           return supertest(app)
-            .get(`/api/folders/${maliciousFolder.id}`)
+            .get(`/api/noteful/folders/${maliciousFolder.id}`)
             .expect(200)
             .expect((res) => {
               expect(res.body.folderName).to.eql(expectedFolder.folderName)
@@ -122,33 +110,30 @@ describe('Folders Endpoints', function () {
         const folderId = 1;
         const expectedFolder = camelCaseKeys(testFolders[folderId - 1]);
         return supertest(app)
-          .get(`/api/folders/${folderId}`)
+          .get(`/api/noteful/folders/${folderId}`)
           .expect(200, expectedFolder)
       });
     });
   });
 
-  describe('POST /api/folders', () => {
+  describe('POST /api/noteful/folders', () => {
     it('creates a folder, responding with 201 and the new folder', function () {
-      // Enable for endpoints where dates are being generated
-      // this.retries(3);
-
       const newFolder = {
         folderName: 'Test new folder',
       };
 
       return supertest(app)
-      .post('/api/folders')
+      .post('/api/noteful/folders')
       .send(newFolder)
       .expect(201)
       .expect(res => {
         expect(res.body.folderName).to.eql(newFolder.folderName);
         expect(res.body).to.have.property('id');
-        expect(res.headers.location).to.eql(`/api/folders/${res.body.id}`);
+        expect(res.headers.location).to.eql(`/api/noteful/folders/${res.body.id}`);
       })
       .then(postRes => {
         return supertest(app)
-          .get(`/api/folders/${postRes.body.id}`)
+          .get(`/api/noteful/folders/${postRes.body.id}`)
           .expect(postRes.body)
       });
     });
@@ -163,7 +148,7 @@ describe('Folders Endpoints', function () {
         delete newFolder[field];
 
         return supertest(app)
-          .post('/api/folders')
+          .post('/api/noteful/folders')
           .send(newFolder)
           .expect(400, {
             error: { message: `Required properties are missing: ${field}` }
@@ -177,7 +162,7 @@ describe('Folders Endpoints', function () {
 
       it("removes XSS attack content", () => {
         return supertest(app)
-          .post(`/api/folders`)
+          .post(`/api/noteful/folders`)
           .send(maliciousFolder)
           .expect(201)
           .expect((res) => {
@@ -187,12 +172,12 @@ describe('Folders Endpoints', function () {
     });
   });
 
-  describe('DELETE /api/folders/:folder_id', () => {
+  describe('DELETE /api/noteful/folders/:folder_id', () => {
     context('given no folders in the database', () => {
       it('responds with 404', () => {
         const folderId = 123456;
         return supertest(app)
-          .delete(`/api/folders/${folderId}`)
+          .delete(`/api/noteful/folders/${folderId}`)
           .expect(404, { error: { message: `Folder does not exist` } })
       });
     })
@@ -204,11 +189,6 @@ describe('Folders Endpoints', function () {
         return db
           .into('noteful_folders')
           .insert(testFolders)
-          .then(() => {
-            // return db
-            //   .into('noteful_folders')
-            //   .insert(testFolders);
-          })
       });
 
       it('responds with 204 and removes the folder', () => {
@@ -217,23 +197,23 @@ describe('Folders Endpoints', function () {
         const expectedFolders = serializedTestFolders
           .filter(folder => folder.id !== idToRemove);
         return supertest(app)
-          .delete(`/api/folders/${idToRemove}`)
+          .delete(`/api/noteful/folders/${idToRemove}`)
           .expect(204)
           .then(res => {
             return supertest(app)
-              .get('/api/folders')
+              .get('/api/noteful/folders')
               .expect(expectedFolders)
           });
       });
     });
   });
 
-  describe('PATCH /api/folders/:folder_id', () => {
+  describe('PATCH /api/noteful/folders/:folder_id', () => {
     context('Given no folders', () => {
       it('responds with 404', () => {
         const folderId = 123456;
         return supertest(app)
-          .patch(`/api/folders/${folderId}`)
+          .patch(`/api/noteful/folders/${folderId}`)
           .expect(404, { error: { message: `Folder does not exist` } })
       });
     });
@@ -245,11 +225,6 @@ describe('Folders Endpoints', function () {
         return db
           .into('noteful_folders')
           .insert(testFolders)
-          .then(() => {
-            // return db
-            //   .into('noteful_folders')
-            //   .insert(testFolders);
-          })
       });
 
       it('responds with 204 and updates the folder', () => {
@@ -264,12 +239,12 @@ describe('Folders Endpoints', function () {
         };
 
         return supertest(app)
-          .patch(`/api/folders/${idToUpdate}`)
+          .patch(`/api/noteful/folders/${idToUpdate}`)
           .send(updateFolder)
           .expect(204)
           .then(res => {
             return supertest(app)
-              .get(`/api/folders/${idToUpdate}`)
+              .get(`/api/noteful/folders/${idToUpdate}`)
               .expect(expectedFolder)
           });
       });
@@ -277,7 +252,7 @@ describe('Folders Endpoints', function () {
       it('responds with 400 when no required fields supplied', () => {
         const idToUpdate = 2;
         return supertest(app)
-          .patch(`/api/folders/${idToUpdate}`)
+          .patch(`/api/noteful/folders/${idToUpdate}`)
           .send({ irrelevantField: 'foo' })
           .expect(400, {
             error: {
@@ -298,12 +273,12 @@ describe('Folders Endpoints', function () {
         };
 
         return supertest(app)
-          .patch(`/api/folders/${idToUpdate}`)
+          .patch(`/api/noteful/folders/${idToUpdate}`)
           .send({...updateFolder, fieldToIgnore: 'should not be in GET response'})
           .expect(204)
           .then(res => {
             return supertest(app)
-              .get(`/api/folders/${idToUpdate}`)
+              .get(`/api/noteful/folders/${idToUpdate}`)
               .expect(expectedFolder)
           });
       });
