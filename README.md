@@ -10,7 +10,7 @@ Complete the following steps to use noteful-server:
 2. `cd` into the cloned repository
 3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
 4. Install the node dependencies `npm install`
-5. Create an `.env` file that will be ignored by git and read by the express server; it should contain variables NODE_ENV, PORT, API_TOKEN, DB_URL, TEST_DB_URL
+5. Create an `.env` file that will be ignored by git and read by the express server; it should contain variables NODE_ENV, PORT, API_TOKEN, DATABASE_URL, TEST_DATABASE_URL
 
 ## Scripts
 
