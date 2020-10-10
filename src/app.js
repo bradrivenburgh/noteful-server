@@ -46,14 +46,14 @@ app.use(morgan(morganOption));
 app.use(cors());
 app.use(helmet());
 app.use(express.json()); // Enable if using non-GET endpoints
-// app.use(validateBearerToken); // Enable after adding validation
+app.use(validateBearerToken); // Enable after adding validation
 // Routers can go here
 app.use('/api/noteful', foldersRouter);
 app.use('/api/noteful', notesRouter);
 app.use(errorHandler);
 
-app.get('/', (req, res) => {
-  res.send('Hello, boilerplate!');
+app.get('/api/noteful', (req, res) => {
+  res.send('Hello, noteful!');
 });
 
 module.exports = app;

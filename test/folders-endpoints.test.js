@@ -12,7 +12,7 @@ describe('Folders Endpoints', function () {
   before('make knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DB_URL,
+      connection: process.env.TEST_DATABASE_URL,
     });
 
     app.set('db', db);
@@ -30,6 +30,7 @@ describe('Folders Endpoints', function () {
       it('responds with 200 and an empty list', () => {
         return supertest(app)
           .get('/api/noteful/folders')
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(200, []);
       });
     });
@@ -53,6 +54,7 @@ describe('Folders Endpoints', function () {
         it("removes XSS attack content", () => {
           return supertest(app)
             .get(`/api/noteful/folders`)
+            .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
             .expect(200)
             .expect((res) => {
               const insertedFolder = res.body[res.body.length - 1];
@@ -64,6 +66,7 @@ describe('Folders Endpoints', function () {
       it(`responds with 200 and all of the folders`, () => {
         return supertest(app)
           .get('/api/noteful/folders')
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(200, testFolders.map(camelCaseKeys))
       });
     });
@@ -76,6 +79,7 @@ describe('Folders Endpoints', function () {
         const folderId = 123456;
         return supertest(app)
           .get(`/api/noteful/folders/${folderId}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: {  message: `Folder does not exist` } });
       });
     });
@@ -99,6 +103,7 @@ describe('Folders Endpoints', function () {
         it("removes XSS attack content", () => {
           return supertest(app)
             .get(`/api/noteful/folders/${maliciousFolder.id}`)
+            .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
             .expect(200)
             .expect((res) => {
               expect(res.body.folderName).to.eql(expectedFolder.folderName)
@@ -111,6 +116,7 @@ describe('Folders Endpoints', function () {
         const expectedFolder = camelCaseKeys(testFolders[folderId - 1]);
         return supertest(app)
           .get(`/api/noteful/folders/${folderId}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(200, expectedFolder)
       });
     });
@@ -124,6 +130,7 @@ describe('Folders Endpoints', function () {
 
       return supertest(app)
       .post('/api/noteful/folders')
+      .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
       .send(newFolder)
       .expect(201)
       .expect(res => {
@@ -134,6 +141,7 @@ describe('Folders Endpoints', function () {
       .then(postRes => {
         return supertest(app)
           .get(`/api/noteful/folders/${postRes.body.id}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(postRes.body)
       });
     });
@@ -149,6 +157,7 @@ describe('Folders Endpoints', function () {
 
         return supertest(app)
           .post('/api/noteful/folders')
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send(newFolder)
           .expect(400, {
             error: { message: `Required properties are missing: ${field}` }
@@ -163,6 +172,7 @@ describe('Folders Endpoints', function () {
       it("removes XSS attack content", () => {
         return supertest(app)
           .post(`/api/noteful/folders`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send(maliciousFolder)
           .expect(201)
           .expect((res) => {
@@ -178,6 +188,7 @@ describe('Folders Endpoints', function () {
         const folderId = 123456;
         return supertest(app)
           .delete(`/api/noteful/folders/${folderId}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: { message: `Folder does not exist` } })
       });
     })
@@ -198,10 +209,12 @@ describe('Folders Endpoints', function () {
           .filter(folder => folder.id !== idToRemove);
         return supertest(app)
           .delete(`/api/noteful/folders/${idToRemove}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(204)
           .then(res => {
             return supertest(app)
               .get('/api/noteful/folders')
+              .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
               .expect(expectedFolders)
           });
       });
@@ -214,6 +227,7 @@ describe('Folders Endpoints', function () {
         const folderId = 123456;
         return supertest(app)
           .patch(`/api/noteful/folders/${folderId}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: { message: `Folder does not exist` } })
       });
     });
@@ -240,11 +254,13 @@ describe('Folders Endpoints', function () {
 
         return supertest(app)
           .patch(`/api/noteful/folders/${idToUpdate}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send(updateFolder)
           .expect(204)
           .then(res => {
             return supertest(app)
               .get(`/api/noteful/folders/${idToUpdate}`)
+              .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
               .expect(expectedFolder)
           });
       });
@@ -253,6 +269,7 @@ describe('Folders Endpoints', function () {
         const idToUpdate = 2;
         return supertest(app)
           .patch(`/api/noteful/folders/${idToUpdate}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send({ irrelevantField: 'foo' })
           .expect(400, {
             error: {
@@ -274,11 +291,13 @@ describe('Folders Endpoints', function () {
 
         return supertest(app)
           .patch(`/api/noteful/folders/${idToUpdate}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send({...updateFolder, fieldToIgnore: 'should not be in GET response'})
           .expect(204)
           .then(res => {
             return supertest(app)
               .get(`/api/noteful/folders/${idToUpdate}`)
+              .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
               .expect(expectedFolder)
           });
       });

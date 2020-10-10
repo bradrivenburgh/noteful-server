@@ -13,7 +13,7 @@ describe('Notes Endpoints', function () {
   before('make knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DB_URL,
+      connection: process.env.TEST_DATABASE_URL,
     });
 
     app.set('db', db);
@@ -31,6 +31,7 @@ describe('Notes Endpoints', function () {
       it('responds with 200 and an empty list', () => {
         return supertest(app)
           .get('/api/noteful/notes')
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(200, []);
       });
     });
@@ -60,6 +61,7 @@ describe('Notes Endpoints', function () {
         it("removes XSS attack content", () => {
           return supertest(app)
             .get(`/api/noteful/notes`)
+            .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
             .expect(200)
             .expect((res) => {
               const insertedNote = res.body[res.body.length - 1];
@@ -72,6 +74,7 @@ describe('Notes Endpoints', function () {
       it(`responds with 200 and all of the notes`, () => {
         return supertest(app)
           .get('/api/noteful/notes')
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(200, testNotes.map(camelCaseKeys))
       });
     });
@@ -84,6 +87,7 @@ describe('Notes Endpoints', function () {
         const noteId = 123456;
         return supertest(app)
           .get(`/api/noteful/notes/${noteId}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: {  message: `Note does not exist` } });
       });
     });
@@ -113,6 +117,7 @@ describe('Notes Endpoints', function () {
         it("removes XSS attack content", () => {
           return supertest(app)
             .get(`/api/noteful/notes/${maliciousNote.id}`)
+            .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
             .expect(200)
             .expect((res) => {
               expect(res.body.noteName).to.eql(expectedNote.noteName);
@@ -126,6 +131,7 @@ describe('Notes Endpoints', function () {
         const expectedNote = camelCaseKeys(testNotes[noteId - 1]);
         return supertest(app)
           .get(`/api/noteful/notes/${noteId}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(200, expectedNote)
       });
     });
@@ -151,6 +157,7 @@ describe('Notes Endpoints', function () {
 
       return supertest(app)
       .post('/api/noteful/notes')
+      .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
       .send(newNote)
       .expect(201)
       .expect(res => {
@@ -167,6 +174,7 @@ describe('Notes Endpoints', function () {
       .then(postRes => {
         return supertest(app)
           .get(`/api/noteful/notes/${postRes.body.id}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(postRes.body)
       });
     });
@@ -184,6 +192,7 @@ describe('Notes Endpoints', function () {
 
         return supertest(app)
           .post('/api/noteful/notes')
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send(newNote)
           .expect(400, {
             error: { message: `Required properties are missing: ${field}` }
@@ -198,6 +207,7 @@ describe('Notes Endpoints', function () {
       it('removes XSS attack content', () => {
         return supertest(app)
           .post(`/api/noteful/notes`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send(maliciousNote)
           .expect(201)
           .expect((res) => {
@@ -214,6 +224,7 @@ describe('Notes Endpoints', function () {
         const notesId = 123456;
         return supertest(app)
           .delete(`/api/noteful/notes/${notesId}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: { message: `Note does not exist` } })
       });
     })
@@ -240,10 +251,12 @@ describe('Notes Endpoints', function () {
           .filter(note => note.id !== idToRemove);
         return supertest(app)
           .delete(`/api/noteful/notes/${idToRemove}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(204)
           .then(res => {
             return supertest(app)
               .get('/api/noteful/notes')
+              .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
               .expect(expectedNotes)
           });
       });
@@ -256,6 +269,7 @@ describe('Notes Endpoints', function () {
         const noteId = 123456;
         return supertest(app)
           .patch(`/api/noteful/notes/${noteId}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: { message: `Note does not exist` } })
       });
     });
@@ -289,11 +303,13 @@ describe('Notes Endpoints', function () {
 
         return supertest(app)
           .patch(`/api/noteful/notes/${idToUpdate}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send(updateNote)
           .expect(204)
           .then(res => {
             return supertest(app)
               .get(`/api/noteful/notes/${idToUpdate}`)
+              .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
               .expect(expectedNote)
           });
       });
@@ -302,6 +318,7 @@ describe('Notes Endpoints', function () {
         const idToUpdate = 2;
         return supertest(app)
           .patch(`/api/noteful/notes/${idToUpdate}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send({ irrelevantField: 'foo' })
           .expect(400, {
             error: {
@@ -323,11 +340,13 @@ describe('Notes Endpoints', function () {
 
         return supertest(app)
           .patch(`/api/noteful/notes/${idToUpdate}`)
+          .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
           .send({...updateNote, fieldToIgnore: 'should not be in GET response'})
           .expect(204)
           .then(res => {
             return supertest(app)
               .get(`/api/noteful/notes/${idToUpdate}`)
+              .set("Authorization", `Bearer ${process.env.API_TOKEN}`)
               .expect(expectedNote)
           });
       });
